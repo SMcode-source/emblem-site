@@ -1,0 +1,1545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EMBLEM - Insurance Predictive Modeling Platform</title>
+<style>
+:root {
+  --primary: #1a365d;
+  --primary-light: #2c5282;
+  --accent: #e2a800;
+  --accent-light: #f6e05e;
+  --bg: #f7fafc;
+  --card: #ffffff;
+  --text: #2d3748;
+  --text-light: #718096;
+  --border: #e2e8f0;
+  --success: #38a169;
+  --danger: #e53e3e;
+  --info: #3182ce;
+  --warning: #d69e2e;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); }
+
+/* Top Menu Bar */
+.menu-bar {
+  background: var(--primary);
+  color: white;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  height: 36px;
+  font-size: 13px;
+  border-bottom: 2px solid var(--accent);
+}
+.menu-bar .logo {
+  font-weight: 700;
+  font-size: 15px;
+  padding: 0 16px;
+  background: var(--accent);
+  color: var(--primary);
+  height: 100%;
+  display: flex;
+  align-items: center;
+  letter-spacing: 2px;
+}
+.menu-bar .menu-items { display: flex; height: 100%; }
+.menu-bar .menu-item {
+  padding: 0 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  transition: background .2s;
+  position: relative;
+}
+.menu-bar .menu-item:hover { background: var(--primary-light); }
+.menu-bar .menu-item.active { background: var(--primary-light); border-bottom: 2px solid var(--accent); }
+
+/* Toolbar */
+.toolbar {
+  background: #edf2f7;
+  border-bottom: 1px solid var(--border);
+  padding: 4px 8px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+.toolbar button {
+  padding: 4px 10px;
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  font-size: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: all .15s;
+}
+.toolbar button:hover { background: var(--accent-light); border-color: var(--accent); }
+.toolbar button.active { background: var(--accent); color: var(--primary); font-weight: 600; }
+.toolbar .separator { width: 1px; height: 20px; background: var(--border); margin: 0 4px; }
+.toolbar select {
+  padding: 4px 8px;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  font-size: 12px;
+  background: white;
+}
+
+/* Status bar */
+.status-bar {
+  background: var(--primary);
+  color: #a0aec0;
+  font-size: 11px;
+  padding: 3px 12px;
+  display: flex;
+  justify-content: space-between;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  z-index: 100;
+}
+.status-bar .status-item { display: flex; align-items: center; gap: 8px; }
+.status-bar .status-ok { color: #68d391; }
+.status-bar .status-val { color: var(--accent-light); }
+
+/* Main layout */
+.main-container {
+  display: flex;
+  height: calc(100vh - 36px - 33px - 24px);
+}
+
+/* Left Panel - Terms in Model */
+.left-panel {
+  width: 260px;
+  min-width: 260px;
+  background: white;
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+  font-size: 12px;
+}
+.left-panel .panel-header {
+  background: var(--primary);
+  color: white;
+  padding: 8px 12px;
+  font-weight: 600;
+  font-size: 13px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+.term-item {
+  padding: 4px 8px 4px 12px;
+  border-bottom: 1px solid #f0f0f0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: background .15s;
+}
+.term-item:hover { background: #ebf8ff; }
+.term-item.selected { background: #bee3f8; font-weight: 600; }
+.term-item input[type="checkbox"] { accent-color: var(--primary); }
+.term-item .term-icon {
+  font-size: 10px;
+  color: var(--text-light);
+  width: 16px;
+  text-align: center;
+}
+.term-item .term-type {
+  font-size: 9px;
+  padding: 1px 4px;
+  border-radius: 2px;
+  margin-left: auto;
+  white-space: nowrap;
+}
+.term-type.simple { background: #c6f6d5; color: #276749; }
+.term-type.offset { background: #fed7d7; color: #9b2c2c; }
+.term-type.control { background: #fefcbf; color: #975a16; }
+
+/* Center Panel */
+.center-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Tab bar */
+.tab-bar {
+  background: #edf2f7;
+  display: flex;
+  border-bottom: 1px solid var(--border);
+  padding-left: 8px;
+}
+.tab {
+  padding: 8px 20px;
+  font-size: 13px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  border-bottom: none;
+  margin-bottom: -1px;
+  border-radius: 6px 6px 0 0;
+  transition: all .15s;
+}
+.tab:hover { background: white; }
+.tab.active { background: white; border-color: var(--border); font-weight: 600; color: var(--primary); }
+
+/* Content Area */
+.content-area {
+  flex: 1;
+  overflow: auto;
+  padding: 16px;
+}
+
+/* Model Comparison Table */
+.comparison-table {
+  width: 100%;
+  max-width: 800px;
+  border-collapse: collapse;
+  font-size: 13px;
+  margin-bottom: 20px;
+}
+.comparison-table th {
+  background: var(--primary);
+  color: white;
+  padding: 8px 12px;
+  text-align: center;
+  font-weight: 600;
+}
+.comparison-table th:first-child { text-align: left; background: #4a5568; }
+.comparison-table td {
+  padding: 6px 12px;
+  border: 1px solid var(--border);
+  text-align: center;
+}
+.comparison-table td:first-child { text-align: left; font-weight: 500; background: #f7fafc; }
+.comparison-table tr:hover td { background: #ebf8ff; }
+.val-positive { color: var(--success); font-weight: 600; }
+.val-negative { color: var(--danger); font-weight: 600; }
+.val-neutral { color: var(--text-light); }
+.model-label { background: var(--accent-light) !important; font-weight: 700 !important; }
+
+/* Volume Summary Table */
+.volume-table {
+  width: 100%;
+  max-width: 500px;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.volume-table th {
+  background: var(--info);
+  color: white;
+  padding: 8px 12px;
+}
+.volume-table td {
+  padding: 6px 12px;
+  border: 1px solid var(--border);
+  text-align: right;
+}
+.volume-table td:first-child { text-align: left; font-weight: 500; }
+.volume-table tr.base-row { background: #ebf8ff; font-weight: 600; }
+
+/* Chart Container */
+.chart-container {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+  position: relative;
+}
+.chart-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--primary);
+  margin-bottom: 12px;
+  text-align: center;
+}
+.chart-canvas-wrapper {
+  position: relative;
+  width: 100%;
+  height: 350px;
+}
+canvas { display: block; }
+
+/* Legend */
+.chart-legend {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  margin-top: 12px;
+  font-size: 12px;
+  flex-wrap: wrap;
+}
+.legend-item { display: flex; align-items: center; gap: 4px; }
+.legend-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+/* Beta Pages Table */
+.beta-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+.beta-table th {
+  background: var(--primary);
+  color: white;
+  padding: 6px 10px;
+  position: sticky;
+  top: 0;
+}
+.beta-table td {
+  padding: 5px 10px;
+  border: 1px solid var(--border);
+  text-align: right;
+}
+.beta-table td:nth-child(2) { text-align: left; }
+.beta-table tr:nth-child(even) { background: #f7fafc; }
+.beta-table tr:hover td { background: #ebf8ff; }
+.beta-table .base-level { background: #e6fffa !important; font-weight: 600; }
+.se-low { color: var(--success); }
+.se-high { color: var(--danger); }
+
+/* Correlation Matrix */
+.corr-matrix {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11px;
+}
+.corr-matrix th {
+  background: var(--primary);
+  color: white;
+  padding: 6px 8px;
+  font-size: 10px;
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  height: 100px;
+}
+.corr-matrix th:first-child { writing-mode: horizontal-tb; height: auto; }
+.corr-matrix td {
+  padding: 4px 6px;
+  border: 1px solid var(--border);
+  text-align: center;
+  font-size: 11px;
+}
+.corr-matrix td:first-child { text-align: left; font-weight: 500; background: #f7fafc; font-size: 10px; }
+
+/* Cards */
+.card {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 16px;
+}
+.card-header {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid var(--accent);
+}
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 16px;
+}
+
+/* Settings panel */
+.settings-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+  font-size: 13px;
+}
+.settings-row label { width: 150px; font-weight: 500; }
+.settings-row select, .settings-row input {
+  padding: 5px 10px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-size: 13px;
+}
+
+/* Right Panel */
+.right-panel {
+  width: 280px;
+  min-width: 280px;
+  background: white;
+  border-left: 1px solid var(--border);
+  overflow-y: auto;
+  font-size: 12px;
+}
+.right-panel .panel-header {
+  background: var(--info);
+  color: white;
+  padding: 8px 12px;
+  font-weight: 600;
+  font-size: 13px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+.info-row {
+  padding: 6px 12px;
+  border-bottom: 1px solid #f0f0f0;
+  display: flex;
+  justify-content: space-between;
+}
+.info-row .info-label { color: var(--text-light); }
+.info-row .info-value { font-weight: 600; }
+
+/* Buttons */
+.btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all .2s;
+}
+.btn-primary { background: var(--primary); color: white; }
+.btn-primary:hover { background: var(--primary-light); }
+.btn-accent { background: var(--accent); color: var(--primary); }
+.btn-accent:hover { background: #c99a00; }
+.btn-success { background: var(--success); color: white; }
+.btn-danger { background: var(--danger); color: white; }
+
+/* Modal */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+.modal-overlay.show { display: flex; }
+.modal {
+  background: white;
+  border-radius: 8px;
+  padding: 24px;
+  max-width: 600px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+}
+.modal h3 { color: var(--primary); margin-bottom: 16px; }
+
+/* Misc */
+.flex { display: flex; }
+.gap-8 { gap: 8px; }
+.gap-16 { gap: 16px; }
+.mb-8 { margin-bottom: 8px; }
+.mb-16 { margin-bottom: 16px; }
+.text-sm { font-size: 12px; }
+.text-muted { color: var(--text-light); }
+.fw-600 { font-weight: 600; }
+.hidden { display: none; }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: #f1f1f1; }
+::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #a1a1a1; }
+
+/* Data import area */
+.drop-zone {
+  border: 2px dashed var(--border);
+  border-radius: 8px;
+  padding: 40px;
+  text-align: center;
+  cursor: pointer;
+  transition: all .2s;
+}
+.drop-zone:hover { border-color: var(--accent); background: #fffbeb; }
+.drop-zone .icon { font-size: 48px; margin-bottom: 12px; }
+
+/* Notification */
+.notification {
+  position: fixed;
+  top: 50px;
+  right: 20px;
+  padding: 12px 20px;
+  border-radius: 6px;
+  color: white;
+  font-size: 13px;
+  z-index: 2000;
+  animation: slideIn .3s ease;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+.notification.success { background: var(--success); }
+.notification.info { background: var(--info); }
+.notification.warning { background: var(--warning); }
+@keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+</style>
+</head>
+<body>
+
+<!-- Menu Bar -->
+<div class="menu-bar">
+  <div class="logo">EMBLEM</div>
+  <div class="menu-items">
+    <div class="menu-item" onclick="showTab('summary')">File</div>
+    <div class="menu-item" onclick="showTab('summary')">Edit</div>
+    <div class="menu-item" onclick="showTab('specify')">Specify</div>
+    <div class="menu-item active" onclick="showTab('summary')">Fit</div>
+    <div class="menu-item" onclick="showTab('graphs')">View</div>
+    <div class="menu-item" onclick="showTab('summary')">Modelling</div>
+    <div class="menu-item" onclick="showTab('correlation')">Tools</div>
+    <div class="menu-item" onclick="showTab('summary')">Window</div>
+    <div class="menu-item" onclick="showTab('summary')">Help</div>
+  </div>
+  <div style="margin-left:auto; padding-right:16px; font-size:11px; color:#a0aec0;">
+    AD Frequency - Emblem
+  </div>
+</div>
+
+<!-- Toolbar -->
+<div class="toolbar">
+  <button onclick="showTab('import')" title="Import Data">&#128193; Import</button>
+  <button onclick="fitModel()" title="Fit Model" class="active">&#9654; Fit</button>
+  <div class="separator"></div>
+  <button onclick="showTab('summary')">&#128202; Summary</button>
+  <button onclick="showTab('beta')">&#946; Parameters</button>
+  <button onclick="showTab('graphs')">&#128200; Graphs</button>
+  <button onclick="showTab('export')">&#128229; Export</button>
+  <div class="separator"></div>
+  <select id="modelSelector" onchange="switchModel(this.value)">
+    <option value="current">Current Model</option>
+    <option value="ref1">Reference Model 1</option>
+    <option value="ref2">Reference Model 2</option>
+    <option value="ref3">Reference Model 3</option>
+    <option value="ref4">Reference Model 4</option>
+  </select>
+  <button onclick="saveRefModel()" title="Save as Reference">&#128190; Save Ref</button>
+  <div class="separator"></div>
+  <select id="errorFamily" onchange="updateModel()">
+    <option value="poisson">Poisson Error</option>
+    <option value="gamma">Gamma Error</option>
+    <option value="normal">Normal Error</option>
+    <option value="binomial">Binomial Error</option>
+    <option value="tweedie">Tweedie Error</option>
+  </select>
+  <select id="linkFunction" onchange="updateModel()">
+    <option value="log">Log Link</option>
+    <option value="identity">Identity Link</option>
+    <option value="logit">Logit Link</option>
+    <option value="inverse">Inverse Link</option>
+  </select>
+  <div class="separator"></div>
+  <button onclick="runStepwise('backward')">&#8592; Backward</button>
+  <button onclick="runStepwise('forward')">&#8594; Forward</button>
+  <button onclick="showTab('correlation')">&#128279; Correlation</button>
+  <button onclick="showTab('interaction')">&#8646; Interactions</button>
+</div>
+
+<!-- Main Layout -->
+<div class="main-container">
+
+  <!-- Left Panel: Terms in Model -->
+  <div class="left-panel">
+    <div class="panel-header">Terms in Model</div>
+    <div id="termsPanel"></div>
+  </div>
+
+  <!-- Center -->
+  <div class="center-panel">
+    <div class="tab-bar">
+      <div class="tab active" data-tab="summary" onclick="showTab('summary')">Summary</div>
+      <div class="tab" data-tab="graphs" onclick="showTab('graphs')">Graphs</div>
+      <div class="tab" data-tab="beta" onclick="showTab('beta')">&#946; Parameters</div>
+      <div class="tab" data-tab="volume" onclick="showTab('volume')">Volume</div>
+      <div class="tab" data-tab="correlation" onclick="showTab('correlation')">Correlation</div>
+      <div class="tab" data-tab="interaction" onclick="showTab('interaction')">Interactions</div>
+      <div class="tab" data-tab="export" onclick="showTab('export')">Export</div>
+      <div class="tab" data-tab="specify" onclick="showTab('specify')">Settings</div>
+      <div class="tab" data-tab="import" onclick="showTab('import')">Data</div>
+    </div>
+
+    <div class="content-area" id="contentArea">
+
+      <!-- SUMMARY TAB -->
+      <div id="tab-summary" class="tab-content">
+        <div class="card">
+          <div class="card-header">Quick Model Comparison</div>
+          <table class="comparison-table" id="comparisonTable">
+            <tr>
+              <th></th>
+              <th>Current Model</th>
+              <th>Reference Model</th>
+              <th>Difference</th>
+            </tr>
+            <tr><td>Model Label</td><td class="model-label" id="currLabel">(none)*</td><td class="model-label" id="refLabel">(none)*</td><td id="diffLabel">—</td></tr>
+            <tr><td>Sampling</td><td>Modelling</td><td>Modelling</td><td class="val-neutral">—</td></tr>
+            <tr><td>Truncated Description</td><td id="currDesc">Age of Youngest Driver + RatingArea + ...</td><td id="refDesc">Age of Youngest Driver + RatingArea + ...</td><td id="diffDesc">—</td></tr>
+            <tr><td>Zero Weighted</td><td id="currZero">244,484</td><td id="refZero">244,484</td><td id="diffZero" class="val-neutral">0</td></tr>
+            <tr><td>Fixed or Simple Alias</td><td id="currAlias">0</td><td id="refAlias">0</td><td id="diffAlias" class="val-neutral">0</td></tr>
+            <tr><td>Complex Alias</td><td id="currComplex">0</td><td id="refComplex">0</td><td id="diffComplex" class="val-neutral">0</td></tr>
+            <tr><td>Fitted Parameters</td><td id="currParams">156</td><td id="refParams">152</td><td id="diffParams" class="val-negative">+4</td></tr>
+            <tr><td>Deviance</td><td id="currDev">195,727.8</td><td id="refDev">195,816.6</td><td id="diffDev" class="val-positive">-88.8</td></tr>
+            <tr><td>Chi Squared Percentage</td><td id="currChi">—</td><td id="refChi">—</td><td id="diffChi">Sub-Model 0.6%</td></tr>
+            <tr><td>AICc</td><td id="currAIC">272,044.2</td><td id="refAIC">272,068.7</td><td id="diffAIC" class="val-positive">-24.5</td></tr>
+            <tr><td>Fitting Result</td><td id="currFit" class="val-positive">Converged OK</td><td id="refFit" class="val-positive">Converged OK</td><td class="val-neutral">—</td></tr>
+          </table>
+        </div>
+
+        <div class="card-grid">
+          <div class="card">
+            <div class="card-header">Goodness of Fit Metrics</div>
+            <div class="info-row"><span class="info-label">Deviance</span><span class="info-value" id="statDeviance">195,727.8</span></div>
+            <div class="info-row"><span class="info-label">AICc</span><span class="info-value" id="statAIC">272,044.2</span></div>
+            <div class="info-row"><span class="info-label">BIC</span><span class="info-value" id="statBIC">273,512.1</span></div>
+            <div class="info-row"><span class="info-label">Log Likelihood</span><span class="info-value" id="statLL">-135,866.1</span></div>
+            <div class="info-row"><span class="info-label">Scale (&#966;)</span><span class="info-value" id="statScale">1.00</span></div>
+            <div class="info-row"><span class="info-label">Degrees of Freedom</span><span class="info-value" id="statDF">568,467</span></div>
+          </div>
+          <div class="card">
+            <div class="card-header">Model Configuration</div>
+            <div class="info-row"><span class="info-label">Error Distribution</span><span class="info-value" id="cfgError">Poisson</span></div>
+            <div class="info-row"><span class="info-label">Link Function</span><span class="info-value" id="cfgLink">Log</span></div>
+            <div class="info-row"><span class="info-label">Total Observations</span><span class="info-value" id="cfgObs">813,103</span></div>
+            <div class="info-row"><span class="info-label">Zero Weighted</span><span class="info-value">244,484</span></div>
+            <div class="info-row"><span class="info-label">Fitted Parameters</span><span class="info-value" id="cfgFitted">156</span></div>
+            <div class="info-row"><span class="info-label">Iterations</span><span class="info-value" id="cfgIter">2</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- GRAPHS TAB -->
+      <div id="tab-graphs" class="tab-content hidden">
+        <div class="flex gap-16 mb-16" style="flex-wrap:wrap;">
+          <div class="settings-row">
+            <label>Variable:</label>
+            <select id="graphVariable" onchange="updateGraph()">
+              <option value="numDrivers">Number of Drivers</option>
+              <option value="ageYoungest">Age of Youngest Driver</option>
+              <option value="ratingArea">Rating Area</option>
+              <option value="vehicleAge">Vehicle Age</option>
+              <option value="vehicleValue">Vehicle Value</option>
+            </select>
+          </div>
+          <div class="settings-row">
+            <label>Y-Axis Type:</label>
+            <select id="graphYType" onchange="updateGraph()">
+              <option value="predicted">Predicted Value</option>
+              <option value="rescaledPredicted">Rescaled Predicted Value</option>
+              <option value="linearPredictor">Linear Predictor</option>
+              <option value="rescaledLinear">Rescaled Linear Predictor</option>
+            </select>
+          </div>
+        </div>
+        <div class="flex gap-8 mb-16" style="flex-wrap:wrap;">
+          <label style="font-size:12px;display:flex;align-items:center;gap:4px;">
+            <input type="checkbox" id="showObserved" checked onchange="updateGraph()"> Observed Average
+          </label>
+          <label style="font-size:12px;display:flex;align-items:center;gap:4px;">
+            <input type="checkbox" id="showFitted" checked onchange="updateGraph()"> Fitted Average
+          </label>
+          <label style="font-size:12px;display:flex;align-items:center;gap:4px;">
+            <input type="checkbox" id="showCI" onchange="updateGraph()"> Confidence Intervals (&#177;2 SE)
+          </label>
+          <label style="font-size:12px;display:flex;align-items:center;gap:4px;">
+            <input type="checkbox" id="showWeight" checked onchange="updateGraph()"> Weight Volume
+          </label>
+        </div>
+        <div class="chart-container">
+          <div class="chart-title" id="chartTitle">Predicted Values - Number of Drivers</div>
+          <canvas id="mainChart" width="800" height="350"></canvas>
+          <div class="chart-legend" id="chartLegend"></div>
+        </div>
+      </div>
+
+      <!-- BETA PARAMETERS TAB -->
+      <div id="tab-beta" class="tab-content hidden">
+        <div class="flex gap-16 mb-16">
+          <div class="settings-row">
+            <label>Display:</label>
+            <select id="betaDisplay" onchange="updateBetaTable()">
+              <option value="fitted">Fitted Value (&#946;)</option>
+              <option value="rescaled">Rescaled Fitted Value</option>
+              <option value="expValue">Exp(Value)</option>
+            </select>
+          </div>
+          <button class="btn btn-primary" onclick="exportBeta()">&#128229; Export to Excel</button>
+        </div>
+        <div style="overflow-x:auto;">
+          <table class="beta-table" id="betaTable">
+            <tr>
+              <th>#</th>
+              <th>Name</th>
+              <th>Value (&#946;)</th>
+              <th>Std Error</th>
+              <th>Std Error %</th>
+              <th>Alias %</th>
+              <th>Weight</th>
+              <th>Weight %</th>
+              <th>Exp(Value)</th>
+            </tr>
+          </table>
+        </div>
+      </div>
+
+      <!-- VOLUME TAB -->
+      <div id="tab-volume" class="tab-content hidden">
+        <div class="card">
+          <div class="card-header">Volume Summary</div>
+          <div class="settings-row mb-16">
+            <label>Variable:</label>
+            <select id="volumeVariable" onchange="updateVolume()">
+              <option value="numDrivers">Number of Drivers</option>
+              <option value="ageYoungest">Age of Youngest Driver</option>
+              <option value="ratingArea">Rating Area</option>
+              <option value="vehicleAge">Vehicle Age</option>
+              <option value="vehicleValue">Vehicle Value</option>
+            </select>
+          </div>
+          <table class="volume-table" id="volumeTable">
+            <tr><th>Level</th><th>No. Observations</th><th>Weight</th></tr>
+          </table>
+          <div style="margin-top:12px;" class="text-sm text-muted">
+            <strong>Note:</strong> Weight is the denominator of the target variable (e.g., Earned Exposures for frequency models).
+            No. Observations is the number of rows in the input data for each level.
+          </div>
+        </div>
+      </div>
+
+      <!-- CORRELATION TAB -->
+      <div id="tab-correlation" class="tab-content hidden">
+        <div class="card">
+          <div class="card-header">Correlation Statistics</div>
+          <div class="flex gap-16 mb-16" style="flex-wrap:wrap;">
+            <div class="settings-row">
+              <label>Statistic:</label>
+              <select id="corrStatistic">
+                <option value="cramersV">Cramer's V</option>
+                <option value="chiSquare">Chi-Square</option>
+                <option value="contCoeff">Contingency Coefficient</option>
+                <option value="phi">Phi Coefficient</option>
+              </select>
+            </div>
+            <div class="settings-row">
+              <label>Threshold:</label>
+              <input type="range" id="corrThreshold" min="0" max="100" value="13" oninput="updateCorrThreshold(this.value)" style="width:150px;">
+              <span id="corrThresholdVal">0.13</span>
+            </div>
+          </div>
+          <div style="overflow-x:auto;">
+            <table class="corr-matrix" id="corrMatrix"></table>
+          </div>
+          <div style="margin-top:16px;">
+            <canvas id="corrGraph" width="500" height="400"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- INTERACTION TAB -->
+      <div id="tab-interaction" class="tab-content hidden">
+        <div class="card">
+          <div class="card-header">Multi-way Interaction Tests</div>
+          <div class="flex gap-16 mb-16">
+            <div class="settings-row">
+              <label>Variable 1:</label>
+              <select id="interVar1">
+                <option value="gender">Gender</option>
+                <option value="ageYoungest">Age of Youngest Driver</option>
+                <option value="vehicleAge">Vehicle Age</option>
+                <option value="ratingArea">Rating Area</option>
+              </select>
+            </div>
+            <div class="settings-row">
+              <label>Variable 2:</label>
+              <select id="interVar2">
+                <option value="vehicleAge">Vehicle Age</option>
+                <option value="gender">Gender</option>
+                <option value="ageYoungest">Age of Youngest Driver</option>
+                <option value="ratingArea">Rating Area</option>
+              </select>
+            </div>
+            <button class="btn btn-primary" onclick="testInteraction()">Test Interaction</button>
+          </div>
+          <div class="chart-container">
+            <div class="chart-title" id="interTitle">Gender x Vehicle Age - Multi-way Results</div>
+            <canvas id="interChart" width="800" height="350"></canvas>
+            <div class="chart-legend" id="interLegend"></div>
+          </div>
+          <div id="interResult" class="card" style="margin-top:16px;">
+            <p class="fw-600">Chi-Square Test Result:</p>
+            <p class="text-sm" style="margin-top:8px;">
+              Model with interaction: Deviance = <span class="val-positive">195,698.2</span> | Parameters = 186<br>
+              Model without interaction: Deviance = 195,727.8 | Parameters = 156<br>
+              Difference in deviance: 29.6 on 30 df<br>
+              <strong>p-value: 0.487</strong> — Interaction is <span class="val-negative">NOT significant</span> at 5% level.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- EXPORT TAB -->
+      <div id="tab-export" class="tab-content hidden">
+        <div class="card">
+          <div class="card-header">&#946; Exporter</div>
+          <div class="settings-row mb-16">
+            <label>Export Format:</label>
+            <select id="exportFormat">
+              <option value="rescaledFitted">Rescaled Fitted Value</option>
+              <option value="linearPredictor">Linear Predictor</option>
+              <option value="fittedValue">Fitted Value</option>
+              <option value="rescaledLinear">Rescaled Linear Predictor</option>
+            </select>
+          </div>
+          <p class="text-sm text-muted mb-16">
+            Exports a comprehensive indicated factor list. Base appears at the top (intercept), simple factors below, and interaction factors at the bottom.
+            For "Rescaled Fitted Value", every base level shows 1.000.
+          </p>
+          <div id="exportPreview" style="overflow-x:auto; max-height:400px; overflow-y:auto;">
+            <table class="beta-table" id="exportTable"></table>
+          </div>
+          <div style="margin-top:16px;">
+            <button class="btn btn-accent" onclick="exportToExcel()">&#128229; Export to Excel</button>
+            <button class="btn btn-primary" onclick="exportToCSV()" style="margin-left:8px;">&#128196; Export to CSV</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">Convert to Scoring Model</div>
+          <p class="text-sm mb-16">Convert the fitted model into a scoring model that can be deployed for real-time predictions.</p>
+          <button class="btn btn-success" onclick="notify('Scoring model generated successfully!','success')">Generate Scoring Model</button>
+        </div>
+      </div>
+
+      <!-- SETTINGS TAB -->
+      <div id="tab-specify" class="tab-content hidden">
+        <div class="card">
+          <div class="card-header">Model Specification</div>
+          <div class="settings-row">
+            <label>Error Distribution:</label>
+            <select id="settingsError">
+              <option value="poisson" selected>Poisson</option>
+              <option value="gamma">Gamma</option>
+              <option value="normal">Normal (Gaussian)</option>
+              <option value="binomial">Binomial</option>
+              <option value="tweedie">Tweedie</option>
+              <option value="inversegaussian">Inverse Gaussian</option>
+            </select>
+          </div>
+          <div class="settings-row">
+            <label>Link Function:</label>
+            <select id="settingsLink">
+              <option value="log" selected>Log</option>
+              <option value="identity">Identity</option>
+              <option value="logit">Logit</option>
+              <option value="inverse">Inverse</option>
+              <option value="sqrt">Square Root</option>
+              <option value="power">Power</option>
+            </select>
+          </div>
+          <div class="settings-row">
+            <label>Target Variable:</label>
+            <select id="settingsTarget">
+              <option value="frequency">Frequency (Claims/Exposure)</option>
+              <option value="severity">Severity (Loss/Claims)</option>
+              <option value="purePremium">Pure Premium (Loss/Exposure)</option>
+            </select>
+          </div>
+          <div class="settings-row">
+            <label>Weight Column:</label>
+            <select id="settingsWeight">
+              <option value="earnedExposure">Earned Exposure</option>
+              <option value="claimCount">Claim Count</option>
+              <option value="none">None</option>
+            </select>
+          </div>
+          <div class="settings-row">
+            <label>Max Iterations:</label>
+            <input type="number" id="settingsMaxIter" value="50" min="1" max="500" style="width:80px;">
+          </div>
+          <div class="settings-row">
+            <label>Convergence Tolerance:</label>
+            <input type="number" id="settingsTol" value="0.0001" step="0.00001" style="width:120px;">
+          </div>
+          <div style="margin-top:16px;">
+            <button class="btn btn-primary" onclick="fitModel()">Apply & Fit</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">Curve Fitting Options</div>
+          <p class="text-sm text-muted mb-8">Apply polynomial curve fits to continuous variables to reduce parameters and produce smooth factor patterns.</p>
+          <div class="settings-row">
+            <label>Variable:</label>
+            <select id="curveVar">
+              <option value="vehicleAge">Vehicle Age</option>
+              <option value="ageYoungest">Age of Youngest Driver</option>
+              <option value="vehicleValue">Vehicle Value</option>
+            </select>
+          </div>
+          <div class="settings-row">
+            <label>Polynomial Degree:</label>
+            <select id="curveDegree">
+              <option value="1">1 (Linear)</option>
+              <option value="2">2 (Quadratic)</option>
+              <option value="3" selected>3 (Cubic)</option>
+              <option value="4">4 (Quartic)</option>
+            </select>
+          </div>
+          <div class="settings-row">
+            <label>Log Transform:</label>
+            <input type="checkbox" id="curveLog"> <span class="text-sm">Apply log to large continuous variables</span>
+          </div>
+          <div style="margin-top:12px;">
+            <button class="btn btn-accent" onclick="applyCurveFit()">Apply Curve Fit</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">Offset Factors</div>
+          <p class="text-sm text-muted mb-8">Set pre-determined factors that the GLM will work around without recalculating.</p>
+          <div class="settings-row">
+            <label>Variable:</label>
+            <select id="offsetVar">
+              <option value="none">— Select —</option>
+              <option value="territory">Territory</option>
+              <option value="limits">Limits & Deductibles</option>
+            </select>
+          </div>
+          <div style="margin-top:12px;">
+            <button class="btn btn-primary" onclick="setOffset()">Set as Offset</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- DATA IMPORT TAB -->
+      <div id="tab-import" class="tab-content hidden">
+        <div class="card">
+          <div class="card-header">Data Import</div>
+          <div class="drop-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
+            <div class="icon">&#128193;</div>
+            <p class="fw-600">Click to select or drag & drop your data file</p>
+            <p class="text-sm text-muted" style="margin-top:8px;">Supports CSV, Excel (.xlsx), or EMBLEM (.fac) files</p>
+            <input type="file" id="fileInput" accept=".csv,.xlsx,.fac" style="display:none" onchange="handleFileImport(this)">
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">Sample Data (Demo)</div>
+          <p class="text-sm mb-16">Load a built-in sample auto insurance dataset to explore EMBLEM's features.</p>
+          <button class="btn btn-accent" onclick="loadSampleData()">&#9654; Load Sample Auto Insurance Data</button>
+        </div>
+        <div class="card" id="dataPreview" style="display:none;">
+          <div class="card-header">Data Preview</div>
+          <div id="dataPreviewContent" style="overflow-x:auto;"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Right Panel: Variable Info -->
+  <div class="right-panel">
+    <div class="panel-header">Variable Details</div>
+    <div id="varDetails">
+      <div class="info-row"><span class="info-label">Selected</span><span class="info-value" id="selVarName">Number of Drivers</span></div>
+      <div class="info-row"><span class="info-label">Type</span><span class="info-value" id="selVarType">Categorical</span></div>
+      <div class="info-row"><span class="info-label">Levels</span><span class="info-value" id="selVarLevels">5</span></div>
+      <div class="info-row"><span class="info-label">Base Level</span><span class="info-value" id="selVarBase">1</span></div>
+      <div class="info-row"><span class="info-label">Parameters</span><span class="info-value" id="selVarParams">4</span></div>
+      <div class="info-row"><span class="info-label">Treatment</span><span class="info-value" id="selVarTreat">Simple Factor</span></div>
+    </div>
+    <div class="panel-header" style="margin-top:1px;">Volume for Selected</div>
+    <div id="varVolume"></div>
+    <div class="panel-header" style="margin-top:1px;">Quick Actions</div>
+    <div style="padding:12px; display:flex; flex-direction:column; gap:8px;">
+      <button class="btn btn-primary" onclick="showTab('graphs')" style="width:100%; font-size:12px;">&#128200; View Graph</button>
+      <button class="btn btn-primary" onclick="showTab('beta')" style="width:100%; font-size:12px;">&#946; View Parameters</button>
+      <button class="btn btn-accent" onclick="toggleCurveFit()" style="width:100%; font-size:12px;">&#128200; Toggle Curve Fit</button>
+      <button class="btn btn-danger" onclick="removeVariable()" style="width:100%; font-size:12px;">&#10005; Remove from Model</button>
+    </div>
+  </div>
+</div>
+
+<!-- Status Bar -->
+<div class="status-bar">
+  <div class="status-item">
+    <span class="status-ok">&#9679;</span>
+    <span>Finished Iteration: <span class="status-val">2</span></span>
+    <span>|</span>
+    <span><span class="status-val">813,103</span> observations</span>
+    <span>|</span>
+    <span><span class="status-val">244,484</span> zero weighted</span>
+    <span>|</span>
+    <span><span class="status-val">156</span> parameters (156 fitted)</span>
+    <span>|</span>
+    <span>0 fixed/simple aliases</span>
+    <span>|</span>
+    <span>0 complex aliases</span>
+  </div>
+  <div class="status-item">
+    <span>Poisson Error</span>
+    <span>|</span>
+    <span>Log Link</span>
+    <span>|</span>
+    <span>Scale (&#966;): <span class="status-val">1.00</span></span>
+  </div>
+</div>
+
+<!-- Modal for Stepwise -->
+<div class="modal-overlay" id="stepwiseModal">
+  <div class="modal">
+    <h3 id="stepwiseTitle">Stepwise Regression Results</h3>
+    <div id="stepwiseContent"></div>
+    <div style="margin-top:16px; text-align:right;">
+      <button class="btn btn-primary" onclick="closeModal('stepwiseModal')">Close</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ========== DATA ==========
+const variables = [
+  { id: 'analysisPeriod', name: 'Analysis Period', checked: false, type: 'control', levels: 4, treatment: 'Control Variable' },
+  { id: 'samplingWeight', name: 'Random 10 [Sampling Weights: Modelling]', checked: false, type: 'control', levels: 2, treatment: 'Sampling Weight' },
+  { id: 'ageMainDriver', name: 'Age of Main Driver', checked: false, type: 'simple', levels: 85, treatment: 'Simple Factor' },
+  { id: 'ageYoungest', name: 'Age of Youngest Driver', checked: true, type: 'simple', levels: 68, treatment: 'Simple Factor', curveFit: true },
+  { id: 'ageYoungestAdd', name: 'Age of Youngest Additional Driver', checked: false, type: 'simple', levels: 50, treatment: 'Simple Factor' },
+  { id: 'genderMain', name: 'Gender of Main Driver', checked: false, type: 'simple', levels: 2, treatment: 'Simple Factor' },
+  { id: 'genderYoungest', name: 'Gender of Youngest Driver', checked: false, type: 'simple', levels: 2, treatment: 'Simple Factor' },
+  { id: 'genderYoungestAdd', name: 'Gender of Youngest Additional Driver', checked: false, type: 'simple', levels: 3, treatment: 'Simple Factor' },
+  { id: 'minLicence', name: 'Minimum Licence Held', checked: false, type: 'simple', levels: 20, treatment: 'Simple Factor' },
+  { id: 'numDrivers', name: 'Number of Drivers', checked: true, type: 'simple', levels: 5, treatment: 'Simple Factor' },
+  { id: 'maritalStatus', name: 'Marital Status Main Driver', checked: false, type: 'simple', levels: 3, treatment: 'Simple Factor' },
+  { id: 'ncdYears', name: 'NCD Years', checked: false, type: 'simple', levels: 10, treatment: 'Simple Factor' },
+  { id: 'ncdProtection', name: 'NCD Protection', checked: false, type: 'simple', levels: 2, treatment: 'Simple Factor' },
+  { id: 'drivingRestriction', name: 'Driving Restriction', checked: false, type: 'simple', levels: 4, treatment: 'Simple Factor' },
+  { id: 'use', name: 'Use', checked: false, type: 'simple', levels: 3, treatment: 'Simple Factor' },
+  { id: 'ratingArea', name: 'RatingArea', checked: true, type: 'simple', levels: 20, treatment: 'Simple Factor' },
+  { id: 'volExcess', name: 'Voluntary Excess', checked: false, type: 'simple', levels: 8, treatment: 'Simple Factor' },
+  { id: 'vehicleGroup', name: 'Vehicle Group', checked: false, type: 'simple', levels: 50, treatment: 'Simple Factor' },
+  { id: 'make', name: 'Make', checked: false, type: 'simple', levels: 30, treatment: 'Simple Factor' },
+  { id: 'vehicleAge', name: 'Vehicle Age', checked: true, type: 'simple', levels: 31, treatment: 'Simple Factor', curveFit: true },
+  { id: 'vehicleValue', name: 'Vehicle Value', checked: true, type: 'simple', levels: 35, treatment: 'Simple Factor', curveFit: true },
+  { id: 'annualMileage', name: 'Annual Mileage', checked: false, type: 'simple', levels: 12, treatment: 'Simple Factor' },
+  { id: 'numPastClaims', name: 'Number of Past Claims', checked: false, type: 'simple', levels: 6, treatment: 'Simple Factor' },
+  { id: 'numPastConvictions', name: 'Number of Past Convictions', checked: false, type: 'simple', levels: 5, treatment: 'Simple Factor' },
+  { id: 'channel', name: 'Channel', checked: false, type: 'simple', levels: 4, treatment: 'Simple Factor' },
+  { id: 'breakdownCover', name: 'Breakdown Cover', checked: false, type: 'simple', levels: 2, treatment: 'Simple Factor' },
+  { id: 'legalProtection', name: 'Legal Protection', checked: false, type: 'simple', levels: 2, treatment: 'Simple Factor' },
+  { id: 'multiProduct', name: 'Multi Product Discount', checked: false, type: 'simple', levels: 2, treatment: 'Simple Factor' },
+  { id: 'paymentMethod', name: 'Payment Method', checked: false, type: 'simple', levels: 3, treatment: 'Simple Factor' },
+  { id: 'paymentFrequency', name: 'Payment Frequency', checked: false, type: 'simple', levels: 2, treatment: 'Simple Factor' },
+  { id: 'numVehicles', name: 'Number of Vehicles', checked: false, type: 'simple', levels: 4, treatment: 'Simple Factor' },
+  { id: 'creditScore', name: 'Credit Score', checked: false, type: 'simple', levels: 10, treatment: 'Simple Factor' },
+];
+
+// Simulated data for Number of Drivers
+const driverData = {
+  numDrivers: {
+    labels: ['1','2','3','4','5'],
+    observations: [426290, 284855, 75807, 23431, 4010],
+    weights: [342035, 228790, 60486, 18886, 3127],
+    observed: [0.0562, 0.0525, 0.0490, 0.0585, 0.0632],
+    fitted: [0.0550, 0.0548, 0.0565, 0.0578, 0.0590],
+    beta: [0, -0.1003, 0.0203, 0.0595, 0.0408],
+    se: [0, 0.01255, 0.01965, 0.03025, 0.07145],
+    expVal: [1, 0.9046, 1.0205, 1.0613, 1.0416],
+  },
+  ageYoungest: {
+    labels: Array.from({length:20}, (_,i) => String(18+i*2)),
+    observations: Array.from({length:20}, () => Math.floor(Math.random()*40000+5000)),
+    weights: Array.from({length:20}, () => Math.floor(Math.random()*30000+3000)),
+    observed: Array.from({length:20}, (_,i) => 0.12 - i*0.004 + Math.random()*0.005),
+    fitted: Array.from({length:20}, (_,i) => 0.11 - i*0.0035),
+    beta: Array.from({length:20}, (_,i) => 0.7 - i*0.06 + Math.random()*0.02),
+    se: Array.from({length:20}, () => Math.random()*0.05+0.01),
+    expVal: Array.from({length:20}, (_,i) => 2.0 - i*0.06),
+  },
+  ratingArea: {
+    labels: Array.from({length:20}, (_,i) => String(i+1)),
+    observations: Array.from({length:20}, () => Math.floor(Math.random()*50000+2000)),
+    weights: Array.from({length:20}, () => Math.floor(Math.random()*40000+1500)),
+    observed: Array.from({length:20}, () => Math.random()*0.03+0.04),
+    fitted: Array.from({length:20}, () => Math.random()*0.025+0.042),
+    beta: Array.from({length:20}, (_,i) => (i === 0 ? 0 : (Math.random()-0.5)*0.3)),
+    se: Array.from({length:20}, () => Math.random()*0.08+0.02),
+    expVal: Array.from({length:20}, () => Math.random()*0.4+0.8),
+  },
+  vehicleAge: {
+    labels: Array.from({length:31}, (_,i) => i === 30 ? '30+' : String(i)),
+    observations: Array.from({length:31}, (_,i) => Math.max(500, Math.floor(40000 - i*1200 + Math.random()*2000))),
+    weights: Array.from({length:31}, (_,i) => Math.max(300, Math.floor(35000 - i*1100 + Math.random()*1500))),
+    observed: Array.from({length:31}, (_,i) => 1.6 - i*0.04 + Math.random()*0.05),
+    fitted: Array.from({length:31}, (_,i) => 1.55 - i*0.038),
+    beta: Array.from({length:31}, (_,i) => (i===0?0: 0.5 - i*0.035)),
+    se: Array.from({length:31}, (_,i) => 0.02 + i*0.003),
+    expVal: Array.from({length:31}, (_,i) => 1.6 - i*0.035),
+  },
+  vehicleValue: {
+    labels: ['<1000','1000-2000','2000-3000','3000-5000','5000-7000','7000-10000','10000-15000','15000-20000','20000-30000','30000+'],
+    observations: [15200,42300,68900,95400,88200,72100,56800,38200,22100,9800],
+    weights: [12100,35600,57200,80100,73500,60200,47300,31800,18400,7900],
+    observed: [0.068,0.062,0.057,0.054,0.052,0.051,0.049,0.048,0.050,0.055],
+    fitted: [0.066,0.061,0.056,0.053,0.051,0.050,0.048,0.047,0.049,0.053],
+    beta: [0.25,0.15,0.07,0,-0.05,-0.08,-0.12,-0.15,-0.10,-0.02],
+    se: [0.04,0.025,0.018,0,0.016,0.019,0.022,0.028,0.035,0.055],
+    expVal: [1.28,1.16,1.07,1.00,0.95,0.92,0.89,0.86,0.90,0.98],
+  }
+};
+
+// Correlation data
+const corrVars = ['Age Youngest','Num Drivers','RatingArea','Vehicle Age','Vehicle Value','Gender','NCD Years','Make'];
+const corrData = [
+  [0,0.049,0.036,0.043,0.072,0.005,0.062,0.041],
+  [0.049,0,0.019,0.030,0.023,0.005,0.017,0.022],
+  [0.036,0.019,0,0.061,0.105,0.013,0.042,0.050],
+  [0.043,0.030,0.061,0,0.320,0.084,0.155,0.089],
+  [0.072,0.023,0.105,0.320,0,0.060,0.197,0.227],
+  [0.005,0.005,0.013,0.084,0.060,0,0.036,0.032],
+  [0.062,0.017,0.042,0.155,0.197,0.036,0,0.085],
+  [0.041,0.022,0.050,0.089,0.227,0.032,0.085,0],
+];
+
+let selectedVariable = 'numDrivers';
+let currentTab = 'summary';
+
+// ========== INITIALIZATION ==========
+function init() {
+  renderTerms();
+  showTab('summary');
+  updateVariableDetails('numDrivers');
+  updateVolume();
+}
+
+// ========== RENDER TERMS PANEL ==========
+function renderTerms() {
+  const panel = document.getElementById('termsPanel');
+  panel.innerHTML = '';
+  variables.forEach(v => {
+    const div = document.createElement('div');
+    div.className = 'term-item' + (v.id === selectedVariable ? ' selected' : '');
+    const typeClass = v.type === 'control' ? 'control' : (v.type === 'offset' ? 'offset' : 'simple');
+    div.innerHTML = `
+      <input type="checkbox" ${v.checked ? 'checked' : ''} onchange="toggleTerm('${v.id}', this.checked)" onclick="event.stopPropagation()">
+      <span class="term-icon">${v.curveFit ? '&#128200;' : '&#9654;'}</span>
+      <span style="flex:1;font-size:11px;">${v.name}</span>
+      ${v.checked ? `<span class="term-type ${typeClass}">${v.treatment.split(' ').map(w=>w[0]).join('')}</span>` : ''}
+    `;
+    div.onclick = () => { selectedVariable = v.id; renderTerms(); updateVariableDetails(v.id); };
+    panel.appendChild(div);
+  });
+}
+
+// ========== TAB SWITCHING ==========
+function showTab(tabName) {
+  currentTab = tabName;
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+  document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+  const tabEl = document.getElementById('tab-' + tabName);
+  if (tabEl) tabEl.classList.remove('hidden');
+  document.querySelectorAll(`.tab[data-tab="${tabName}"]`).forEach(el => el.classList.add('active'));
+
+  if (tabName === 'graphs') updateGraph();
+  if (tabName === 'beta') updateBetaTable();
+  if (tabName === 'volume') updateVolume();
+  if (tabName === 'correlation') updateCorrelation();
+  if (tabName === 'interaction') drawInteraction();
+  if (tabName === 'export') updateExportTable();
+}
+
+// ========== VARIABLE DETAILS ==========
+function updateVariableDetails(varId) {
+  const v = variables.find(x => x.id === varId);
+  if (!v) return;
+  document.getElementById('selVarName').textContent = v.name;
+  document.getElementById('selVarType').textContent = v.levels > 10 ? 'Continuous' : 'Categorical';
+  document.getElementById('selVarLevels').textContent = v.levels;
+  document.getElementById('selVarBase').textContent = '1';
+  document.getElementById('selVarParams').textContent = v.levels - 1;
+  document.getElementById('selVarTreat').textContent = v.treatment;
+
+  const data = driverData[varId];
+  const volDiv = document.getElementById('varVolume');
+  if (data) {
+    volDiv.innerHTML = data.labels.slice(0, 8).map((l, i) =>
+      `<div class="info-row"><span class="info-label">${v.name} (${l})</span><span class="info-value">${(data.weights[i]||0).toLocaleString()}</span></div>`
+    ).join('');
+    if (data.labels.length > 8) volDiv.innerHTML += `<div class="info-row text-muted"><span>... ${data.labels.length - 8} more levels</span></div>`;
+  } else {
+    volDiv.innerHTML = '<div class="info-row text-muted"><span>No data available</span></div>';
+  }
+}
+
+// ========== TOGGLE TERM ==========
+function toggleTerm(id, checked) {
+  const v = variables.find(x => x.id === id);
+  if (v) v.checked = checked;
+  renderTerms();
+  notify(checked ? `Added "${v.name}" to model` : `Removed "${v.name}" from model`, 'info');
+}
+
+// ========== GRAPH ==========
+function updateGraph() {
+  const varId = document.getElementById('graphVariable').value;
+  const yType = document.getElementById('graphYType').value;
+  const showObs = document.getElementById('showObserved').checked;
+  const showFit = document.getElementById('showFitted').checked;
+  const showCI = document.getElementById('showCI').checked;
+  const showWt = document.getElementById('showWeight').checked;
+  const data = driverData[varId];
+  if (!data) return;
+
+  const v = variables.find(x => x.id === varId);
+  const titleMap = { predicted:'Predicted Values', rescaledPredicted:'Rescaled Predicted Values', linearPredictor:'Linear Predictor', rescaledLinear:'Rescaled Linear Predictor' };
+  document.getElementById('chartTitle').textContent = `${titleMap[yType]} - ${v ? v.name : varId}`;
+
+  const canvas = document.getElementById('mainChart');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width = canvas.parentElement.clientWidth - 32;
+  const H = 350;
+  canvas.height = H;
+  ctx.clearRect(0,0,W,H);
+
+  const pad = { top: 20, right: 80, bottom: 50, left: 70 };
+  const chartW = W - pad.left - pad.right;
+  const chartH = H - pad.top - pad.bottom;
+  const n = data.labels.length;
+  const barW = Math.min(40, chartW / n * 0.6);
+
+  // Determine Y values based on type
+  let obsY = data.observed;
+  let fitY = data.fitted;
+  if (yType === 'rescaledPredicted') { obsY = data.expVal; fitY = data.expVal.map(v => v * (0.95 + Math.random()*0.1)); }
+  if (yType === 'linearPredictor') { obsY = data.beta; fitY = data.beta.map(v => v + (Math.random()-0.5)*0.02); }
+  if (yType === 'rescaledLinear') { obsY = data.beta; fitY = data.beta; }
+
+  const allVals = [...obsY, ...fitY];
+  let yMin = Math.min(...allVals) * 0.95;
+  let yMax = Math.max(...allVals) * 1.05;
+  if (yMin === yMax) { yMin -= 0.01; yMax += 0.01; }
+  const maxWt = Math.max(...data.weights);
+
+  // Grid
+  ctx.strokeStyle = '#e2e8f0';
+  ctx.lineWidth = 0.5;
+  for (let i = 0; i <= 5; i++) {
+    const y = pad.top + chartH - (i/5)*chartH;
+    ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(pad.left+chartW, y); ctx.stroke();
+    ctx.fillStyle = '#718096'; ctx.font = '10px sans-serif'; ctx.textAlign = 'right';
+    ctx.fillText((yMin + (yMax-yMin)*(i/5)).toFixed(4), pad.left-8, y+4);
+  }
+
+  // Weight bars
+  if (showWt) {
+    data.weights.forEach((w, i) => {
+      const x = pad.left + (i+0.5)/n * chartW;
+      const barH = (w/maxWt) * chartH * 0.9;
+      ctx.fillStyle = 'rgba(250, 240, 100, 0.7)';
+      ctx.fillRect(x - barW/2, pad.top + chartH - barH, barW, barH);
+      ctx.strokeStyle = '#d4a800';
+      ctx.lineWidth = 0.5;
+      ctx.strokeRect(x - barW/2, pad.top + chartH - barH, barW, barH);
+    });
+    // Right axis for weight
+    ctx.fillStyle = '#718096'; ctx.font = '10px sans-serif'; ctx.textAlign = 'left';
+    for (let i = 0; i <= 5; i++) {
+      const y = pad.top + chartH - (i/5)*chartH;
+      ctx.fillText(Math.round(maxWt*(i/5)/1000) + 'K', W-pad.right+8, y+4);
+    }
+  }
+
+  // X axis labels
+  ctx.fillStyle = '#4a5568'; ctx.font = '10px sans-serif'; ctx.textAlign = 'center';
+  data.labels.forEach((l, i) => {
+    const x = pad.left + (i+0.5)/n * chartW;
+    if (n <= 15 || i % Math.ceil(n/15) === 0) ctx.fillText(l, x, H - pad.bottom + 18);
+  });
+
+  // Lines
+  function drawLine(values, color, width, dash) {
+    ctx.strokeStyle = color;
+    ctx.lineWidth = width;
+    ctx.setLineDash(dash || []);
+    ctx.beginPath();
+    values.forEach((v, i) => {
+      const x = pad.left + (i+0.5)/n * chartW;
+      const y = pad.top + chartH - ((v-yMin)/(yMax-yMin))*chartH;
+      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    });
+    ctx.stroke();
+    ctx.setLineDash([]);
+    // Points
+    values.forEach((v, i) => {
+      const x = pad.left + (i+0.5)/n * chartW;
+      const y = pad.top + chartH - ((v-yMin)/(yMax-yMin))*chartH;
+      ctx.fillStyle = color;
+      ctx.beginPath(); ctx.arc(x, y, 3, 0, Math.PI*2); ctx.fill();
+    });
+  }
+
+  if (showCI) {
+    const upper = fitY.map((v,i) => v + 2*(data.se[i]||0.01));
+    const lower = fitY.map((v,i) => v - 2*(data.se[i]||0.01));
+    drawLine(upper, '#e53e3e', 1.5, [4,4]);
+    drawLine(lower, '#744210', 1.5, [4,4]);
+  }
+  if (showObs) drawLine(obsY, '#d53f8c', 2);
+  if (showFit) drawLine(fitY, '#38a169', 2);
+
+  // Legend
+  const legend = document.getElementById('chartLegend');
+  let legendHTML = '';
+  if (showObs) legendHTML += '<div class="legend-item"><span class="legend-dot" style="background:#d53f8c;"></span> Observed Average</div>';
+  if (showFit) legendHTML += '<div class="legend-item"><span class="legend-dot" style="background:#38a169;"></span> Fitted Average</div>';
+  if (showCI) {
+    legendHTML += '<div class="legend-item"><span class="legend-dot" style="background:#e53e3e;"></span> +2 SE</div>';
+    legendHTML += '<div class="legend-item"><span class="legend-dot" style="background:#744210;"></span> -2 SE</div>';
+  }
+  if (showWt) legendHTML += '<div class="legend-item"><span class="legend-dot" style="background:rgba(250,240,100,0.8);border:1px solid #d4a800;"></span> Weight Volume</div>';
+  legend.innerHTML = legendHTML;
+}
+
+// ========== BETA TABLE ==========
+function updateBetaTable() {
+  const table = document.getElementById('betaTable');
+  table.innerHTML = '<tr><th>#</th><th>Name</th><th>Value (&#946;)</th><th>Std Error</th><th>Std Error %</th><th>Alias %</th><th>Weight</th><th>Weight %</th><th>Exp(Value)</th></tr>';
+  let paramNum = 1;
+  const checkedVars = variables.filter(v => v.checked);
+  checkedVars.forEach(v => {
+    const data = driverData[v.id];
+    if (!data) {
+      for (let i = 0; i < Math.min(v.levels, 5); i++) {
+        const isBase = i === 0;
+        const beta = isBase ? 0 : ((Math.random()-0.5)*0.3).toFixed(4);
+        const se = isBase ? '' : (Math.random()*0.05+0.01).toFixed(5);
+        const sePct = isBase ? '' : (Math.abs(se/beta)*100).toFixed(1);
+        const tr = document.createElement('tr');
+        if (isBase) tr.className = 'base-level';
+        tr.innerHTML = `<td>${isBase ? '-' : paramNum}</td><td>${v.name} (${i+1})</td><td>${isBase ? '-' : beta}</td><td>${se}</td><td class="${parseFloat(sePct)>50?'se-high':'se-low'}">${sePct}</td><td>0</td><td>${Math.floor(Math.random()*50000+1000).toLocaleString()}</td><td>${(Math.random()*5).toFixed(1)}</td><td>${isBase ? '-' : Math.exp(beta).toFixed(4)}</td>`;
+        table.appendChild(tr);
+        if (!isBase) paramNum++;
+      }
+    } else {
+      data.labels.forEach((label, i) => {
+        const isBase = i === 0;
+        const tr = document.createElement('tr');
+        if (isBase) tr.className = 'base-level';
+        const sePct = isBase ? '' : (data.se[i] ? (data.se[i]/Math.abs(data.beta[i]||1)*100).toFixed(1) : '');
+        const wtPct = ((data.weights[i]/data.weights.reduce((a,b)=>a+b,0))*100).toFixed(1);
+        tr.innerHTML = `<td>${isBase ? '-' : paramNum}</td><td>${v.name} (${label})</td><td>${isBase ? '-' : data.beta[i].toFixed(4)}</td><td>${isBase ? '' : data.se[i].toFixed(5)}</td><td class="${parseFloat(sePct)>50?'se-high':'se-low'}">${sePct}</td><td>0</td><td>${data.weights[i].toLocaleString()}</td><td>${wtPct}</td><td>${isBase ? '-' : data.expVal[i].toFixed(4)}</td>`;
+        table.appendChild(tr);
+        if (!isBase) paramNum++;
+      });
+    }
+  });
+}
+
+// ========== VOLUME ==========
+function updateVolume() {
+  const varId = document.getElementById('volumeVariable') ? document.getElementById('volumeVariable').value : 'numDrivers';
+  const data = driverData[varId];
+  const table = document.getElementById('volumeTable');
+  if (!data || !table) return;
+  const v = variables.find(x => x.id === varId);
+  table.innerHTML = `<tr><th>${v ? v.name : 'Level'}</th><th>No. Observations</th><th>Weight</th></tr>`;
+  data.labels.forEach((label, i) => {
+    const tr = document.createElement('tr');
+    if (i === 0) tr.className = 'base-row';
+    tr.innerHTML = `<td>${label}</td><td>${data.observations[i].toLocaleString()}</td><td>${data.weights[i].toLocaleString()}</td>`;
+    table.appendChild(tr);
+  });
+}
+
+// ========== CORRELATION ==========
+function updateCorrelation() {
+  const table = document.getElementById('corrMatrix');
+  let html = '<tr><th></th>' + corrVars.map(v => `<th>${v}</th>`).join('') + '</tr>';
+  const thresh = parseFloat(document.getElementById('corrThresholdVal').textContent);
+  corrVars.forEach((v, i) => {
+    html += '<tr><td>' + v + '</td>';
+    corrData[i].forEach((val, j) => {
+      const bg = i === j ? '#e2e8f0' : (val > thresh ? `rgba(229,62,62,${Math.min(val*3,0.8)})` : (val > thresh*0.5 ? `rgba(237,137,54,${Math.min(val*3,0.5)})` : ''));
+      html += `<td style="background:${bg}">${val.toFixed(3)}</td>`;
+    });
+    html += '</tr>';
+  });
+  table.innerHTML = html;
+  drawCorrGraph(thresh);
+}
+function updateCorrThreshold(val) {
+  document.getElementById('corrThresholdVal').textContent = (val/100).toFixed(2);
+  updateCorrelation();
+}
+function drawCorrGraph(thresh) {
+  const canvas = document.getElementById('corrGraph');
+  const ctx = canvas.getContext('2d');
+  const W = 500, H = 400;
+  canvas.width = W; canvas.height = H;
+  ctx.clearRect(0,0,W,H);
+  const cx = W/2, cy = H/2, r = 150;
+  const n = corrVars.length;
+  const positions = corrVars.map((_, i) => {
+    const a = (i / n) * Math.PI * 2 - Math.PI/2;
+    return [cx + r * Math.cos(a), cy + r * Math.sin(a)];
+  });
+  // Lines
+  for (let i = 0; i < n; i++) for (let j = i+1; j < n; j++) {
+    if (corrData[i][j] > thresh) {
+      ctx.strokeStyle = `rgba(229,62,62,${Math.min(corrData[i][j]*3,1)})`;
+      ctx.lineWidth = Math.max(1, corrData[i][j] * 15);
+      ctx.beginPath(); ctx.moveTo(positions[i][0], positions[i][1]); ctx.lineTo(positions[j][0], positions[j][1]); ctx.stroke();
+    }
+  }
+  // Nodes
+  positions.forEach(([x,y], i) => {
+    ctx.fillStyle = '#c6f6d5'; ctx.strokeStyle = '#38a169'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.arc(x, y, 20, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = '#2d3748'; ctx.font = '9px sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText(corrVars[i], x, y + 4);
+  });
+  ctx.fillStyle = '#718096'; ctx.font = '11px sans-serif'; ctx.textAlign = 'left';
+  ctx.fillText(`Threshold: ${thresh.toFixed(2)}`, 10, 16);
+}
+
+// ========== INTERACTIONS ==========
+function drawInteraction() {
+  const canvas = document.getElementById('interChart');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width = canvas.parentElement.clientWidth - 32;
+  const H = 350; canvas.height = H;
+  ctx.clearRect(0,0,W,H);
+  const pad = {top:20,right:80,bottom:50,left:70};
+  const chartW = W-pad.left-pad.right, chartH = H-pad.top-pad.bottom;
+  const n = 16;
+  const labels = Array.from({length:n}, (_,i) => String(i));
+
+  // Two groups
+  const g1Obs = Array.from({length:n}, (_,i) => 0.22 - i*0.008 + Math.random()*0.003);
+  const g1Fit = Array.from({length:n}, (_,i) => 0.215 - i*0.0075);
+  const g2Obs = Array.from({length:n}, (_,i) => 0.17 - i*0.006 + Math.random()*0.003);
+  const g2Fit = Array.from({length:n}, (_,i) => 0.168 - i*0.0058);
+  const allV = [...g1Obs,...g1Fit,...g2Obs,...g2Fit];
+  const yMin = Math.min(...allV)*0.95, yMax = Math.max(...allV)*1.05;
+  const barW = chartW/n*0.35;
+
+  // Grid
+  ctx.strokeStyle = '#e2e8f0'; ctx.lineWidth = 0.5;
+  for (let i=0;i<=5;i++) { const y=pad.top+chartH-(i/5)*chartH; ctx.beginPath();ctx.moveTo(pad.left,y);ctx.lineTo(pad.left+chartW,y);ctx.stroke(); ctx.fillStyle='#718096';ctx.font='10px sans-serif';ctx.textAlign='right'; ctx.fillText((yMin+(yMax-yMin)*(i/5)).toFixed(3),pad.left-8,y+4); }
+  labels.forEach((l,i) => { ctx.fillStyle='#4a5568';ctx.font='10px sans-serif';ctx.textAlign='center'; ctx.fillText(l, pad.left+(i+0.5)/n*chartW, H-pad.bottom+18); });
+
+  // Bars (stacked)
+  for (let i=0;i<n;i++) {
+    const x = pad.left+(i+0.5)/n*chartW;
+    const h1 = (Math.random()*2000+3000), h2 = (Math.random()*2000+3000);
+    const maxH = 10000;
+    ctx.fillStyle = 'rgba(66,133,204,0.6)'; ctx.fillRect(x-barW, pad.top+chartH-(h1/maxH)*chartH*0.4, barW, (h1/maxH)*chartH*0.4);
+    ctx.fillStyle = 'rgba(104,160,80,0.6)'; ctx.fillRect(x, pad.top+chartH-(h2/maxH)*chartH*0.4, barW, (h2/maxH)*chartH*0.4);
+  }
+
+  // Lines
+  function drawL(vals,color,w,dash) {
+    ctx.strokeStyle=color;ctx.lineWidth=w;ctx.setLineDash(dash||[]);ctx.beginPath();
+    vals.forEach((v,i)=>{const x=pad.left+(i+0.5)/n*chartW;const y=pad.top+chartH-((v-yMin)/(yMax-yMin))*chartH;i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);});ctx.stroke();ctx.setLineDash([]);
+    vals.forEach((v,i)=>{const x=pad.left+(i+0.5)/n*chartW;const y=pad.top+chartH-((v-yMin)/(yMax-yMin))*chartH;ctx.fillStyle=color;ctx.beginPath();ctx.arc(x,y,3,0,Math.PI*2);ctx.fill();});
+  }
+  drawL(g1Obs,'#2b6cb0',2);drawL(g1Fit,'#2b6cb0',1.5,[5,3]);
+  drawL(g2Obs,'#38a169',2);drawL(g2Fit,'#38a169',1.5,[5,3]);
+
+  const legend = document.getElementById('interLegend');
+  legend.innerHTML = '<div class="legend-item"><span class="legend-dot" style="background:#2b6cb0;"></span> Male - Actual</div><div class="legend-item"><span class="legend-dot" style="background:#2b6cb0;border:2px dashed #2b6cb0;background:transparent;"></span> Male - Fitted</div><div class="legend-item"><span class="legend-dot" style="background:#38a169;"></span> Female - Actual</div><div class="legend-item"><span class="legend-dot" style="background:#38a169;border:2px dashed #38a169;background:transparent;"></span> Female - Fitted</div>';
+}
+function testInteraction() { drawInteraction(); notify('Interaction test completed. See results below chart.', 'info'); }
+
+// ========== EXPORT ==========
+function updateExportTable() {
+  const table = document.getElementById('exportTable');
+  table.innerHTML = '<tr><th>Variable</th><th>Level</th><th>Factor (Rescaled)</th></tr>';
+  const tr0 = document.createElement('tr');
+  tr0.className = 'base-level';
+  tr0.innerHTML = '<td><strong>Base (Intercept)</strong></td><td>—</td><td>0.0537</td>';
+  table.appendChild(tr0);
+  variables.filter(v => v.checked).forEach(v => {
+    const data = driverData[v.id];
+    if (data) {
+      data.labels.forEach((l,i) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${v.name}</td><td>${l}</td><td>${(data.expVal[i]||1).toFixed(4)}</td>`;
+        if (i===0) tr.className = 'base-level';
+        table.appendChild(tr);
+      });
+    }
+  });
+}
+
+// ========== ACTIONS ==========
+function fitModel() {
+  notify('Model fitting... Converged OK after 2 iterations.', 'success');
+  document.getElementById('cfgIter').textContent = '2';
+}
+function saveRefModel() { notify('Current model saved as Reference Model.', 'info'); }
+function switchModel(val) { notify(`Switched to ${val === 'current' ? 'Current' : 'Reference'} Model.`, 'info'); }
+function updateModel() {
+  const err = document.getElementById('errorFamily').value;
+  const link = document.getElementById('linkFunction').value;
+  document.getElementById('cfgError').textContent = err.charAt(0).toUpperCase()+err.slice(1);
+  document.getElementById('cfgLink').textContent = link.charAt(0).toUpperCase()+link.slice(1);
+  notify(`Updated to ${err} error with ${link} link.`, 'info');
+}
+function runStepwise(dir) {
+  document.getElementById('stepwiseTitle').textContent = `${dir.charAt(0).toUpperCase()+dir.slice(1)} Stepwise Regression`;
+  const content = document.getElementById('stepwiseContent');
+  const steps = dir === 'backward' ?
+    ['Step 1: Remove "Breakdown Cover" — AICc improved by 0.3', 'Step 2: Remove "Legal Protection" — AICc improved by 0.1', 'Step 3: Cannot remove any more terms without increasing AICc.', 'Final model: 5 terms, AICc = 272,043.8'] :
+    ['Step 1: Add "NCD Years" — AICc improved by 12.4', 'Step 2: Add "Gender of Main Driver" — AICc improved by 3.1', 'Step 3: No more terms improve AICc.', 'Final model: 7 terms, AICc = 272,028.7'];
+  content.innerHTML = steps.map(s => `<p style="margin:6px 0;font-size:13px;">${s}</p>`).join('');
+  document.getElementById('stepwiseModal').classList.add('show');
+}
+function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+function applyCurveFit() { notify('Curve fit applied. Parameters reduced, factors now smooth.', 'success'); }
+function setOffset() { notify('Offset factor set successfully.', 'success'); }
+function toggleCurveFit() { notify('Curve fit toggled for selected variable.', 'info'); }
+function removeVariable() {
+  const v = variables.find(x => x.id === selectedVariable);
+  if (v) { v.checked = false; renderTerms(); notify(`Removed "${v.name}" from model.`, 'warning'); }
+}
+function exportBeta() { notify('Parameters exported to Excel format.', 'success'); }
+function exportToExcel() { notify('Model exported to Excel.', 'success'); }
+function exportToCSV() { notify('Model exported to CSV.', 'success'); }
+function loadSampleData() {
+  notify('Sample auto insurance data loaded: 813,103 observations, 32 variables.', 'success');
+  document.getElementById('dataPreview').style.display = 'block';
+  document.getElementById('dataPreviewContent').innerHTML = '<table class="beta-table"><tr><th>Policy</th><th>Gender</th><th>Age</th><th>Vehicle Age</th><th>Rating Area</th><th>Claims</th><th>Exposure</th></tr><tr><td>1</td><td>M</td><td>34</td><td>5</td><td>12</td><td>0</td><td>1.00</td></tr><tr><td>2</td><td>F</td><td>28</td><td>3</td><td>7</td><td>1</td><td>0.75</td></tr><tr><td>3</td><td>M</td><td>52</td><td>8</td><td>15</td><td>0</td><td>1.00</td></tr><tr><td>4</td><td>F</td><td>19</td><td>12</td><td>3</td><td>0</td><td>0.50</td></tr><tr><td>5</td><td>M</td><td>45</td><td>1</td><td>9</td><td>2</td><td>1.00</td></tr></table><p class="text-sm text-muted" style="margin-top:8px;">Showing 5 of 813,103 rows...</p>';
+  showTab('summary');
+}
+function handleFileImport(input) {
+  if (input.files.length) { notify(`File "${input.files[0].name}" imported successfully.`, 'success'); loadSampleData(); }
+}
+
+// ========== NOTIFICATIONS ==========
+function notify(msg, type) {
+  const div = document.createElement('div');
+  div.className = `notification ${type}`;
+  div.textContent = msg;
+  document.body.appendChild(div);
+  setTimeout(() => div.remove(), 3000);
+}
+
+// Init
+window.addEventListener('load', init);
+window.addEventListener('resize', () => { if (currentTab === 'graphs') updateGraph(); if (currentTab === 'interaction') drawInteraction(); });
+</script>
+</body>
+</html>
