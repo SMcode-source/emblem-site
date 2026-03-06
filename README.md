@@ -1,4 +1,4 @@
-# EMBLEM - Insurance Predictive Modeling Platform
+# SMs GLM Engine - Insurance Predictive Modeling Platform
 
 A web-based recreation of the EMBLEM GLM (Generalized Linear Model) predictive modeling tool used in the insurance industry.
 

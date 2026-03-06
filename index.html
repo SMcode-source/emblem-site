@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>EMBLEM - Insurance Predictive Modeling Platform</title>
+<title>SMs GLM Engine - Insurance Predictive Modeling Platform</title>
 <style>
 :root {
   --primary: #1a365d;
@@ -494,7 +494,7 @@ canvas { display: block; }
 
 <!-- Menu Bar -->
 <div class="menu-bar">
-  <div class="logo">EMBLEM</div>
+  <div class="logo">SMs GLM Engine</div>
   <div class="menu-items">
     <div class="menu-item" onclick="showTab('summary')">File</div>
     <div class="menu-item" onclick="showTab('summary')">Edit</div>
@@ -507,7 +507,7 @@ canvas { display: block; }
     <div class="menu-item" onclick="showTab('summary')">Help</div>
   </div>
   <div style="margin-left:auto; padding-right:16px; font-size:11px; color:#a0aec0;">
-    AD Frequency - Emblem
+    AD Frequency - SMs GLM Engine
   </div>
 </div>
 
@@ -932,13 +932,13 @@ canvas { display: block; }
           <div class="drop-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
             <div class="icon">&#128193;</div>
             <p class="fw-600">Click to select or drag & drop your data file</p>
-            <p class="text-sm text-muted" style="margin-top:8px;">Supports CSV, Excel (.xlsx), or EMBLEM (.fac) files</p>
+            <p class="text-sm text-muted" style="margin-top:8px;">Supports CSV, Excel (.xlsx), or .fac files</p>
             <input type="file" id="fileInput" accept=".csv,.xlsx,.fac" style="display:none" onchange="handleFileImport(this)">
           </div>
         </div>
         <div class="card">
           <div class="card-header">Sample Data (Demo)</div>
-          <p class="text-sm mb-16">Load a built-in sample auto insurance dataset to explore EMBLEM's features.</p>
+          <p class="text-sm mb-16">Load a built-in sample auto insurance dataset to explore SMs GLM Engine features.</p>
           <button class="btn btn-accent" onclick="loadSampleData()">&#9654; Load Sample Auto Insurance Data</button>
         </div>
         <div class="card" id="dataPreview" style="display:none;">
