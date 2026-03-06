@@ -19,7 +19,7 @@ A web-based recreation of the EMBLEM GLM (Generalized Linear Model) predictive m
 
 ## Live Demo
 
-Visit: https://YOUR_USERNAME.github.io/emblem-site/
+Visit: https://SMcode-source.github.io/emblem-site/
 
 ## Based On
 
